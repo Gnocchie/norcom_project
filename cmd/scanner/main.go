@@ -12,4 +12,16 @@ func main() {
 	cfg := config.Load()
 
 	publisher, err := messaging.NewRabbitPublisher(cfg)
+	if err != nil {
+		log.Fatalf("Failed to create RabbitMQ publisher: %v", err)
+	}
+	defer publisher.Close()
+
+	log.Println("Starting file scan in:", cfg.RootPath)
+	err = scanner.Walk(cfg.RootPath, publisher)
+	if err != nil {
+		log.Fatalf("File scanning error: %v", err)
+	}
+
+	log.Println("Scan complete.")
 }
