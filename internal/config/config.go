@@ -16,7 +16,9 @@ type Config struct {
 }
 
 func Load() Config {
-	_ = godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 
 	cfg := Config{
 		RabbitmqHost: getenv("RABBITMQ_HOST", "localhost:5672"),
@@ -33,7 +35,7 @@ func Load() Config {
 }
 
 func getenv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
+	if value := os.Getenv(key); value != "" {
 		return value
 	}
 	return fallback
